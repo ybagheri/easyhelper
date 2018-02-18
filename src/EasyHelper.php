@@ -24,7 +24,7 @@ class EasyHelper
     static function telegramHTTPRequest($token, $method, $datas = [])
     {
         $url = "https://api.telegram.org/bot" . $token ;
-        self::makeHTTPRequest($url, $method, $datas);
+        return self::makeHTTPRequest($url, $method, $datas);
     }
 
 
