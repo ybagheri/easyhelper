@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: bagheri
- * Date: 02/17/2018
- * Time: 03:20 PM
- */
 
 namespace Ybagheri;
 
@@ -12,9 +6,10 @@ namespace Ybagheri;
 class EasyHelper
 {
 
-    static function makeHTTPRequest($token, $method, $datas = [])
+    static function makeHTTPRequest($url, $method, $datas = [])
     {
-        $url = "https://api.telegram.org/bot" . $token . "/" . $method;
+        $url=rtrim($url, '/');
+        $url = $url . "/" .  trim($method, '/');
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -25,6 +20,11 @@ class EasyHelper
         } else {
             return json_decode($res);
         }
+    }
+    static function telegramHTTPRequest($token, $method, $datas = [])
+    {
+        $url = "https://api.telegram.org/bot" . $token ;
+        self::makeHTTPRequest($url, $method, $datas);
     }
 
 
