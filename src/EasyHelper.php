@@ -25,7 +25,20 @@ class EasyHelper
     {
         $url = "https://api.telegram.org/bot" . $token ;
         return self::makeHTTPRequest($url, $method, $datas);
+
     }
 
+    static  function methodGetArgs($className, $methodName){
+        $r = new \ReflectionMethod($className, $methodName);
+        $params = $r->getParameters();
+        $parameters=[];
+        $counter=0;
+        foreach ($params as $param) {
+            $parameters[$counter]['parameter']= $param->getName();
+            $parameters[$counter]['isOptional']= $param->isOptional();
+            $counter++;
+        }
+        return $parameters;
+    }
 
 }
