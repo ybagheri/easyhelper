@@ -21,15 +21,20 @@ class EasyHelper
             return json_decode($res);
         }
     }
-    static function telegramHTTPRequest($token, $method, $datas = [])
+    static function telegramHTTPRequest($token, $method, $datas = null)
     {
         $url = "https://api.telegram.org/bot" . $token ;
-        return self::makeHTTPRequest($url, $method, $datas);
+        return isset($datas)? self::makeHTTPRequest($url, $method, $datas):self::makeHTTPRequest($url, $method );
 
     }
 
-    static  function methodGetArgs($className, $methodName){
-        $r = new \ReflectionMethod($className, $methodName);
+    static  function methodGetArgs($methodName,$className=null ){
+        if(is_null($className)){
+            $r = new \ReflectionFunction($methodName);
+        }else{
+            $r = new \ReflectionMethod($className, $methodName);
+        }
+
         $params = $r->getParameters();
         $parameters=[];
         $counter=0;
@@ -40,5 +45,6 @@ class EasyHelper
         }
         return $parameters;
     }
+//    static function methodParamArgArr
 
 }
