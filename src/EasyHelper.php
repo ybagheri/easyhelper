@@ -16,7 +16,7 @@ class EasyHelper
 //         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($datas));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $datas);
         $res = curl_exec($ch);
-       curl_exec($ch);
+      
         if (curl_error($ch)) {
 //             var_dump(curl_error($ch));
           return curl_error($ch);
