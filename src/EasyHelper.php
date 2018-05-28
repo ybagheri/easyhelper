@@ -5,7 +5,21 @@ namespace Ybagheri;
 
 class EasyHelper
 {
+static function test(){
+//   $url="";
+// $url .= $_SERVER['HTTP_HOST'] . htmlspecialchars($_SERVER['REQUEST_URI']);
+// echo dirname($url)."</br>" ;
+// echo $url;
+  if (file_exists('.env')) {
+//                    echo 'Loading .env...' . PHP_EOL;
+                   $dotenv = new \Dotenv\Dotenv(getcwd());
+                   $dotenv->load();
+    echo getenv('DB_HOST').PHP_EOL;
+    
+               }
 
+
+}
     static function makeHTTPRequest($url, $method, $datas = [])
     {
         $url=rtrim($url, '/');
