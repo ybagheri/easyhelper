@@ -15,32 +15,35 @@ class EasyDatabase
 
     public function __construct($params=[])
     {
-       
-            if ( isset($params['host']) && isset($params['username'])&& isset( $params['password'])&&isset($params['database']) ) {
-                $this->host = $params['host'];
-                $this->username = $params['username'];
-                $this->password = $params['password'];
-                $this->database = $params['database'];
-            }else{
-                if (file_exists('.env')) {
 
-                   $dotenv = new \Dotenv\Dotenv(getcwd());
-                   $dotenv->load();   
-    
-               }
-                if ((getenv('DB_HOST') == '') || (getenv('DB_DATABASE') == '') || (getenv('DB_USERNAME') == '') || (getenv('DB_PASSWORD') == '') ) {
-                    die('database config not defined in .env, please define it.' . PHP_EOL);
-                }
-                $this->host = getenv('DB_HOST');
-                $this->username = getenv('DB_USERNAME');
-                $this->password =getenv('DB_PASSWORD');
-                $this->database = getenv('DB_DATABASE');
+        if ( isset($params['host']) && isset($params['username'])&& isset( $params['password'])&&isset($params['database']) ) {
+            $this->host = $params['host'];
+            $this->username = $params['username'];
+            $this->password = $params['password'];
+            $this->database = $params['database'];
+        }else{
+            if (file_exists(getcwd().'/.env')) {
+                $Loader = new \josegonzalez\Dotenv\Loader(getcwd().'/.env');
+                $Loader->parse();
+                $environment=$Loader->toArray();
+
             }
-            $this->conn = mysqli_connect($this->host, $this->username, $this->password);
+            if (isset($environment)&& (($environment['DB_HOST'] == '') || ($environment['DB_DATABASE'] == '') || ($environment['DB_USERNAME'] == '') || ($environment['DB_PASSWORD'] == '')) ) {
+                die('database config not defined in .env, please define it.' . PHP_EOL);
+            }
+            if (isset($environment)){
+                $this->host = $environment['DB_HOST'];
+                $this->username = $environment['DB_USERNAME'];
+                $this->password =$environment['DB_PASSWORD'];
+                $this->database = $environment['DB_DATABASE'];    
+            }
+            
+        }
+        $this->conn = mysqli_connect($this->host, $this->username, $this->password);
         mysqli_select_db($this->conn, $this->database);
         mysqli_set_charset($this->conn, 'utf8');
-        
-        
+
+
     }
     static public function instance()
     {
@@ -84,31 +87,31 @@ class EasyDatabase
 //        var_dump($result instanceof mysqli_result);
 //        echo PHP_EOL.'count array: '.PHP_EOL;
 //        var_dump(count($result));
-     
-      
+
+
         if ($result === false) {
             $this->debug($query);
             return array("ok" => false, "result" => array());
         }
         if ( is_object($result) && get_class($result) == 'mysqli_result') {
-        
+
             if (mysqli_num_rows($result) == 0) {
                 //it is a SELECT , ... with wrong  query
                 return array("ok" => false, "result" => array());
             } else {
                 //it is a SELECT , ... query with result.
                 $salida = array();
-              
-              
+
+
                 while ($row = mysqli_fetch_assoc($result)) {
                     $salida[] = $row;
                 }
                 mysqli_free_result($result);
-              
+
                 return ["ok" => true, "result" => $salida];
             }
         } else {             //when it returns true, it means query was UPDATE or INSERT , ...
-         
+
             return array("ok" => true, "result" => array());
         }
         return array("ok" => false, "result" => array());

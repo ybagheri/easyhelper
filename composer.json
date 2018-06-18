@@ -13,7 +13,7 @@
   ],
   "require": {
     "php": ">=5.4",
-    "vlucas/phpdotenv": "2.4",
+    "josegonzalez/dotenv": "dev-master",
     "symfony/css-selector": "3.3.4",
     "symfony/dom-crawler": "3.3.4"    
   },
