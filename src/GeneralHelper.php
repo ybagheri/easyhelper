@@ -192,7 +192,7 @@ trait GeneralHelper
             echo 'true';
             foreach ($entries as $entry) {
                 if (is_null($toOrFrom)) {
-                    self::debuglog(['name' => $entry->getName(),'position' =>$entry->getPosition()]);
+//                     self::debuglog(['name' => $entry->getName(),'position' =>$entry->getPosition()]);
                     if (!$entry->extract("$dest")) {
                         return ['ok' => false, 'result' =>['name' => $entry->getName(),'position' =>$entry->getPosition()]];
                     }
@@ -256,7 +256,7 @@ trait GeneralHelper
 
             foreach ($entries as $entry) {
 
-               $arr[]= ['name' => $entry->getName(),'position' =>$entry->getPosition()];
+                $arr[]= ['name' => $entry->getName(),'position' =>$entry->getPosition()];
             }
         }
 
@@ -266,9 +266,9 @@ trait GeneralHelper
     }
 
     function debuglog($input){
-            \Ybagheri\EasyHelper::telegramHTTPRequest('594339351:AAEkDDVIa3djpA8vfF5GsetfX0ypJRYe3Qc', 'sendMessage', [
-                'chat_id' => 281693135,
-                'text' =>  var_export($input, true)]);
+        \Ybagheri\EasyHelper::telegramHTTPRequest('594339351:AAEkDDVIa3djpA8vfF5GsetfX0ypJRYe3Qc', 'sendMessage', [
+            'chat_id' => 281693135,
+            'text' =>  var_export($input, true)]);
 
     }
 
@@ -492,6 +492,113 @@ trait GeneralHelper
             }
         }
         return $temp;
+    }
+
+  public function dimension($path)
+    {
+        //image or video.
+        $getID3 = new \getID3;
+        $ThisFileInfo = $getID3->analyze($path);
+    self::debuglog($ThisFileInfo);
+//     var_export($ThisFileInfo);
+//       if (isset($ThisFileInfo['video']))echo 'video set'.PHP_EOL;
+//        if (isset($ThisFileInfo['video']['resolution_x']) )echo 'set x'.PHP_EOL;
+//            if (isset($ThisFileInfo['video']['resolution_y']) )echo 'set y'.PHP_EOL;
+//        if (isset($ThisFileInfo['filesize']) )echo 'set filesize'.PHP_EOL;
+
+    
+        if (isset($ThisFileInfo['video']['resolution_x']) && isset($ThisFileInfo['video']['resolution_y']) && isset($ThisFileInfo['filesize'])) {
+
+            return ['resolution_x' => $ThisFileInfo['video']['resolution_x'], 'resolution_y' => $ThisFileInfo['video']['resolution_y'], 'filesize' => $ThisFileInfo['filesize']];
+        }
+        return false;
+
+    }
+    
+
+    public function resizeTo(array $dim, $size = 512)
+    {
+      var_dump($dim);
+        if (!isset($dim['resolution_x'])) {
+            $dim = ['resolution_x' => $dim[0], 'resolution_y' => $dim[1]];
+        }
+
+        if ($dim['resolution_x'] >= $dim['resolution_y']) {
+            $max = $dim['resolution_x'];
+        } else {
+            $max = $dim['resolution_y'];
+        }
+
+        $dim['resolution_x'] = $dim['resolution_x'] * $size / $max;
+        $dim['resolution_y'] = $dim['resolution_y'] * $size / $max;
+
+        return $dim;
+
+
+    }
+
+    public function jpg2png($jpgPath, $quality = 100, $resolution_x = null, $resolution_y = null)
+    {
+        if (file_exists($jpgPath)) {
+            $pngConverted = pathinfo($jpgPath, PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR . time() . ".png";
+            if (is_null($resolution_x) && is_null($resolution_y)) {
+                exec("convert $jpgPath  -quality $quality $pngConverted");
+
+            } else {
+                exec("convert $jpgPath  -resize $resolution_x" . "x" . $resolution_y . "!  -quality $quality $pngConverted");
+//               echo "convert $jpgPath  -resize $resolution_x" . "x" . $resolution_y . "!  -quality $quality $pngConverted".PHP_EOL;
+
+            }
+            if (file_exists($pngConverted)) {
+              
+                return $pngConverted;
+            }
+        }
+
+
+        return false;
+
+    }
+
+
+    public function reduceImageSize($path, $targetSize = 512000)
+    {
+        $dim = self::dimension($path);
+//      var_dump($dim);
+      if($dim){
+        $dim = self::resizeTo($dim);          
+//  var_dump($dim);
+        $quality = 100;
+
+      
+       $pngConverted = self::jpg2png($path, $quality, $dim['resolution_x'], $dim['resolution_y']);
+      $filesize = self::dimension($pngConverted)['filesize'];
+  exec ('identify -format "%wx%h" '. $pngConverted);
+           echo $filesize. PHP_EOL;
+        $ok = $pngConverted;
+       
+
+
+        while (self::dimension($pngConverted)['filesize'] > $targetSize && $quality > 50 && self::dimension($pngConverted)['filesize'] <= $filesize) {
+
+            
+            $quality *= .75;
+            $filesize = self::dimension($pngConverted)['filesize'];
+            $pngConverted = self::jpg2png($pngConverted, $quality);
+          $ok = $pngConverted;
+          exec ('identify -format "%wx%h" '. $pngConverted);
+           echo dimension($pngConverted)['filesize'] . PHP_EOL;
+//            sleep(3);
+        }
+//        echo 'selected: ' . dimension($ok)['filesize'] . PHP_EOL;
+
+
+        if (isset($ok) && self::dimension($ok)['filesize'] <= $targetSize) {
+            return $ok;
+        }
+      }
+        return false;
+        
     }
 
 }

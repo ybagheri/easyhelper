@@ -67,7 +67,7 @@ trait HelperBot
 
 
                         if (isset($titleStartChar) && isset($titleLengthChar)&& isset($ThisFileInfo)) {
-                            
+
                             //should be in this format:
                             //start-length ex: ---> 12-7
                             //0 is first charactr.
@@ -84,7 +84,7 @@ trait HelperBot
                         }
 
                         if (isset($performerStartCharc) && isset($performerLengthChar)&& isset($ThisFileInfo)) {
-                           
+
                             //should be in this format:
                             //start-length ex: ---> 12-7
                             //0 is first charactr.
@@ -119,7 +119,7 @@ trait HelperBot
                 } else {
                     $fields = ['caption' => $caption];
                 }
-                
+
 
                 $res = $this->upload($fileType, $file, $fields);
 
@@ -204,7 +204,7 @@ trait HelperBot
 //        \Ybagheri\EasyHelper::telegramHTTPRequest($this->environment["BOT_TOKEN"),'sendMessage',['chat_id' => $this->fromId,'text' =>var_export($allFields,true)]);
         var_dump($allFields);
         $allFields = GeneralHelper::removeNullValue($allFields);
-var_dump($allFields);
+        var_dump($allFields);
         return $this->$method($allFields);
     }
 
@@ -338,6 +338,9 @@ var_dump($allFields);
         $fileId = self::getFileId($type, $message);
         if ($type == 'audio') {
             $res = self::upload($type, null, ['caption' => $message->caption, 'reply_markup' => json_encode($this->sendToAudioReply)], $fileId);
+        }elseif ($type == 'photo') {
+
+            $res = self::upload($type, null, ['caption' => $message->caption, 'reply_markup' => json_encode($this->sendToPhotoReply)], $fileId);
 
         } else {
             $res = self::upload($type, null, ['caption' => $message->caption, 'reply_markup' => json_encode($this->sendToReply)], $fileId);
@@ -366,15 +369,14 @@ var_dump($allFields);
             $fileurl = 'https://api.telegram.org/file/bot' . $this->botToken . '/' . $getFile->result->file_path;
             $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'profile' . DIRECTORY_SEPARATOR . $groupid . '.' . pathinfo($getFile->result->file_path, PATHINFO_EXTENSION);
             if (file_put_contents($path, fopen($fileurl, 'r')) !== false) {
-//                            return array($getFile, $path);
-                return true;
+                return $path;
             }
         }
         return false;
 
     }
 
-    public function download($type, $message, $file_id = null, $pathDir = null)
+    public function download($type, $message, $file_id = null, $pathDir = null,$newName=null)
     {
         if (true) {
             if (is_null($file_id)) {
@@ -382,10 +384,26 @@ var_dump($allFields);
             }
             $getFile = $this->getFile(['file_id' => $file_id]);
             $fileurl = 'https://api.telegram.org/file/bot' . $this->token . '/' . $getFile->result->file_path;
-            if (!isset($pathDir)) {
-                $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+//            var_dump(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+var_dump($getFile)   ;
+if (!isset($pathDir)) {
+                if(is_null($newName)){
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+
+                }else{
+                    $this->log($getFile->result->file_path);
+
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . $newName.'.'.(is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION))?'jpg':pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+
+                }
             } else {
-                $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+                if(is_null($newName)){
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+
+                }else{
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR .  $newName.'.'.(is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION))?'jpg':pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+
+                }
                 $dir = $this->storage . '/' . $this->fromId;
                 if (!is_dir(realpath($dir . "/$pathDir"))) {
                     mkdir($dir . "/$pathDir");
@@ -553,6 +571,9 @@ var_dump($allFields);
 
     public function downloadWithCurlProgress($type, $botToken, $chat_id, $savefilepath, $urlpath, $sendeverysecond = 1)
     {
+        if(is_null($sendeverysecond)){
+            $sendeverysecond=1;
+        }
         $sendmessage = false;
         $sendChatAction = false;
         $message_id = 0;
@@ -854,7 +875,7 @@ var_dump($allFields);
                     GeneralHelper::deleteDirectory($file);
                 }
 
-$desPath=$res['path'];
+                $desPath=$res['path'];
 
 
                 $res = self::sendBatchFile($desPath, true, 3, $caption ,  null,  false,  null,  false,$title,$performer,$titleStartChar,$titleLengthChar,$performerStartChar,$performerLengthChar, $fileNameAsTitle, $fileNameAsPerformer);
