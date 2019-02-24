@@ -8,9 +8,28 @@ class EasyHelper
 
     static function makeHTTPRequest($url, $method, $datas = [])
     {
+		//$proxy_userpwd must be like this ===> "username:pass"
+		
+		
+		
+		
         $url=rtrim($url, '/');
         $url = $url . "/" .  trim($method, '/');
         $ch = curl_init();
+		if(isset($datas['proxy_url'] ) && (isset($datas['proxy_port']) ) ){
+		curl_setopt($ch, CURLOPT_PROXY, $datas['proxy_url']); //your proxy url
+    curl_setopt($ch, CURLOPT_PROXYPORT, $datas['proxy_port']); // your proxy port number 
+	unset($datas['proxy_url']);
+		unset($datas['proxy_port']);
+	if(isset($datas['proxy_userpwd']) ){
+    curl_setopt($ch, CURLOPT_PROXYUSERPWD, $datas['proxy_userpwd']); //username:pass 
+	unset($datas['proxy_userpwd']);
+	}
+		}
+		
+		
+		
+		
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 //         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($datas));
@@ -47,6 +66,7 @@ class EasyHelper
             $parameters[$counter]['isOptional']= $param->isOptional();
             $counter++;
         }
+		
         return $parameters;
     }
 //    static function methodParamArgArr
