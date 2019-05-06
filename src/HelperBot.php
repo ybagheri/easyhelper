@@ -203,7 +203,7 @@ trait HelperBot
         }
 //        \Ybagheri\EasyHelper::telegramHTTPRequest($this->environment["BOT_TOKEN"),'sendMessage',['chat_id' => $this->fromId,'text' =>var_export($allFields,true)]);
         var_dump($allFields);
-        $allFields = GeneralHelper::removeNullValue($allFields);
+        $allFields = $this->removeNullValue($allFields);
         var_dump($allFields);
         return $this->$method($allFields);
     }
