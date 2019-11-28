@@ -336,14 +336,15 @@ trait HelperBot
     public function sendOriginalAndWithoutCaption($type, $message)
     {
         $fileId = self::getFileId($type, $message);
+        $caption = isset($message->caption)?$message->caption:null;
         if ($type == 'audio') {
-            $res = self::upload($type, null, ['caption' => $message->caption, 'reply_markup' => json_encode($this->sendToAudioReply)], $fileId);
+            $res = self::upload($type, null, ['caption' => $caption, 'reply_markup' => json_encode($this->sendToAudioReply)], $fileId);
         }elseif ($type == 'photo') {
 
-            $res = self::upload($type, null, ['caption' => $message->caption, 'reply_markup' => json_encode($this->sendToPhotoReply)], $fileId);
+            $res = self::upload($type, null, ['caption' => $caption, 'reply_markup' => json_encode($this->sendToPhotoReply)], $fileId);
 
         } else {
-            $res = self::upload($type, null, ['caption' => $message->caption, 'reply_markup' => json_encode($this->sendToReply)], $fileId);
+            $res = self::upload($type, null, ['caption' => $caption, 'reply_markup' => json_encode($this->sendToReply)], $fileId);
         }
 
 //        $this->forwardMessage(['chat_id' => $this->spyChannelid, 'from_chat_id' => $this->fromId, 'message_id' => $message->message_id]);
