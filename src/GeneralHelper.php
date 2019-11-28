@@ -518,7 +518,7 @@ trait GeneralHelper
 
     public function resizeTo(array $dim, $size = 512)
     {
-      var_dump($dim);
+      //var_dump($dim);
         if (!isset($dim['resolution_x'])) {
             $dim = ['resolution_x' => $dim[0], 'resolution_y' => $dim[1]];
         }
