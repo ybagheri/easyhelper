@@ -391,7 +391,7 @@ if (!isset($pathDir)) {
                     $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
 
                 }else{
-                    $this->log($getFile->result->file_path);
+                    //$this->log($getFile->result->file_path);
 
                     $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . $newName.'.'.(is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION))?'jpg':pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
 
@@ -415,7 +415,7 @@ if (!isset($pathDir)) {
 //            }
 
             if (self::downloadWithCurlProgress($type, $this->botToken, $this->fromId, $path, $fileurl) !== false) {
-                return $path;
+                return array($getFile,$path);
             }
 
 
