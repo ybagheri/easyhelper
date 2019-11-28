@@ -202,9 +202,9 @@ trait HelperBot
             $method = 'sendVideoNote';
         }
 //        \Ybagheri\EasyHelper::telegramHTTPRequest($this->environment["BOT_TOKEN"),'sendMessage',['chat_id' => $this->fromId,'text' =>var_export($allFields,true)]);
-        var_dump($allFields);
+        //var_dump($allFields);
         $allFields = $this->removeNullValue($allFields);
-        var_dump($allFields);
+        //var_dump($allFields);
         return $this->$method($allFields);
     }
 
@@ -385,7 +385,7 @@ trait HelperBot
             $getFile = $this->getFile(['file_id' => $file_id]);
             $fileurl = 'https://api.telegram.org/file/bot' . $this->token . '/' . $getFile->result->file_path;
 //            var_dump(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
-var_dump($getFile)   ;
+//var_dump($getFile)   ;
 if (!isset($pathDir)) {
                 if(is_null($newName)){
                     $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
