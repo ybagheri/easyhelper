@@ -9,8 +9,8 @@ class EasyHelper
     static function makeHTTPRequest($url, $method, $datas = [], $certAddress = false)
     {
         //$proxy_userpwd must be like this ===> "username:pass"
-        //$certAddress is CURLOPT_CAINFO - path to Certificate Authority (CA) bundle
-        // example : "/etc/certs/cabundle.pem" 
+        //'CURLOPT_CAINFO' => "/etc/certs/cabundle.pem"  is CURLOPT_CAINFO - path to Certificate Authority (CA) bundle
+        // example : 'CURLOPT_CAINFO' => "/etc/certs/cabundle.pem" 
 
         $url = rtrim($url, '/');
         $url = $url . "/" . trim($method, '/');
@@ -28,8 +28,8 @@ class EasyHelper
 
 
         curl_setopt($ch, CURLOPT_URL, $url);
-        if ($certAddress !== false) {
-            curl_setopt($ch, CURLOPT_CAINFO, $certAddress);
+        if (isset($datas['CURLOPT_CAINFO'])) {
+            curl_setopt($ch, CURLOPT_CAINFO, $datas['CURLOPT_CAINFO']);
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
