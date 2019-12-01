@@ -15,6 +15,15 @@ class EasyHelperTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function checkProxyAndCertificateAuthorityHTTPRequest()
+    {
+        $result = EasyHelper::telegramHTTPRequest($this->token, "getMe", [ 'proxy_url' => '118.70.144.77','proxy_port' => '3128',],"cacert-2019-11-27.pem");
+        $this->assertEquals($result->ok, true);
+
+
+    }
+
+
     public function testMethodGetArgs()
     {
         $myclass = new MyClass;
