@@ -918,6 +918,18 @@ trait HelperBot
             'text' =>  var_export($input, true)]);
 
     }
+    
+    public function getFileSize($type, $message)
+    {
+        if ($type != 'photo') {
+            $file_size = $message->$type->file_size;
+        } else {
+            $photo = $message->photo;
+            $photos = array_reverse($photo);
+            $file_size = $photos[0]->file_size;
+        }
+        return round($file_size/1000000);
+    }
 
 
 }
