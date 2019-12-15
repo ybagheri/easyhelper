@@ -173,8 +173,10 @@ trait HelperBot
             'voice' => null,
         ];
 
-        foreach ($fields as $key => $value) {
-            $allFields[$key] = $fields[$key];
+        if(! empty($fields)){
+          foreach ($fields as $key => $value) {
+                    $allFields[$key] = $fields[$key];
+                }
         }
         if (is_null($file_id)) {
             //Upload to Telegram
