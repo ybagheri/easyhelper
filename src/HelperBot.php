@@ -174,9 +174,9 @@ trait HelperBot
         ];
 
         if(! empty($fields)){
-          foreach ($fields as $key => $value) {
-                    $allFields[$key] = $fields[$key];
-                }
+            foreach ($fields as $key => $value) {
+                $allFields[$key] = $fields[$key];
+            }
         }
         if (is_null($file_id)) {
             //Upload to Telegram
@@ -381,55 +381,55 @@ trait HelperBot
 
     public function download($type, $message, $file_id = null, $pathDir = null,$newName=null)
     {
-       
-            if (is_null($file_id)) {
-                $file_id = self::getFileId($type, $message);
-            }
-            $getFile = $this->getFile(['file_id' => $file_id]);
-            if($getFile->ok !== false) {
-                $fileurl = 'https://api.telegram.org/file/bot' . $this->token . '/' . $getFile->result->file_path;
 
-                if (!isset($pathDir)) {
-                    if (is_null($newName)) {
-                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+        if (is_null($file_id)) {
+            $file_id = self::getFileId($type, $message);
+        }
+        $getFile = $this->getFile(['file_id' => $file_id]);
+        if($getFile->ok !== false) {
+            $fileurl = 'https://api.telegram.org/file/bot' . $this->token . '/' . $getFile->result->file_path;
 
-                    } else {
-                        //$this->log($getFile->result->file_path);
+            if (!isset($pathDir)) {
+                if (is_null($newName)) {
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
 
-                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . $newName . '.' . (is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION)) ? 'jpg' : pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
-
-                    }
                 } else {
-                    if (is_null($newName)) {
-                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+                    //$this->log($getFile->result->file_path);
 
-                    } else {
-                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . $newName . '.' . (is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION)) ? 'jpg' : pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . $newName . '.' . (is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION)) ? 'jpg' : pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
 
-                    }
-                    $dir = $this->storage . '/' . $this->fromId;
-                    if (!is_dir(realpath($dir . "/$pathDir"))) {
-                        mkdir($dir . "/$pathDir");
-                    }
                 }
+            } else {
+                if (is_null($newName)) {
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+
+                } else {
+                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . $newName . '.' . (is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION)) ? 'jpg' : pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+
+                }
+                $dir = $this->storage .DIRECTORY_SEPARATOR. $this->fromId;
+                if (!is_dir(realpath($dir . "/$pathDir"))) {
+                    mkdir($dir . "/$pathDir");
+                }
+            }
 
 //            if (file_put_contents($path, fopen($fileurl, 'r')) !== false) {
 //                return $path;
 //            }
 
-                if (self::downloadWithCurlProgress($type, $this->botToken, $this->fromId, $path, $fileurl) !== false) {
-                    return array($getFile, $path);
-                }
+            if (self::downloadWithCurlProgress($type, $this->botToken, $this->fromId, $path, $fileurl) !== false) {
+                return array($getFile, $path);
             }
-           
+        }
 
-        
+
+
         return false;
 
     }
     public function downloadUrlContent($url, $message_id)
     {
-        $path = $this->storage . '/' . $this->fromId . '/download';
+        $path = $this->storage .DIRECTORY_SEPARATOR. $this->fromId . DIRECTORY_SEPARATOR.'download';
 
         $file = GeneralHelper::downloadFromUrl($url, $path);
 
@@ -536,7 +536,7 @@ trait HelperBot
                 $this->setting[$this->fromId][$key] = $value;
             }
         }
-        return file_put_contents($this->storage . '/' . $this->fromId . "/setting.json", json_encode($this->setting[$this->fromId], true));
+        return file_put_contents($this->storage .DIRECTORY_SEPARATOR. $this->fromId . "/setting.json", json_encode($this->setting[$this->fromId], true));
 
     }
 
@@ -547,8 +547,9 @@ trait HelperBot
         $this->glTagLists[$this->fromId]["$data"]['info']['performer'] = $performer;
         $this->glTagLists[$this->fromId]["$data"]['state'] = 0;
 
-        $this->storage = __DIR__ . '/../' . $this->publicPath;
-        $dir = $this->storage . '/' . $this->fromId;
+        //$this->storage = __DIR__ . '/../' . $this->publicPath;
+        $this->storage = dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . $this->publicPath;
+        $dir = $this->storage .DIRECTORY_SEPARATOR. $this->fromId;
         file_put_contents($dir . "/tagLists.json", json_encode($this->glTagLists[$this->fromId], true));
 
 
@@ -567,8 +568,9 @@ trait HelperBot
     {
         $data = time();
         $this->glCaptionLists[$this->fromId]["$data"]['info']['caption'] = $caption;
-        $this->storage = __DIR__ . '/../' . $this->publicPath;
-        $dir = $this->storage . '/' . $this->fromId;
+        //$this->storage = __DIR__ . '/../' . $this->publicPath;
+        $this->storage = dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . $this->publicPath;
+        $dir = $this->storage .DIRECTORY_SEPARATOR. $this->fromId;
         file_put_contents($dir . "/captionLists.json", json_encode($this->glCaptionLists[$this->fromId], true));
 
     }
@@ -814,7 +816,7 @@ trait HelperBot
             } else {
                 $password = '';
             }
-            $dest = $this->storage . '/' . $this->fromId . '/uncompress';
+            $dest = $this->storage .DIRECTORY_SEPARATOR. $this->fromId . DIRECTORY_SEPARATOR.'uncompress';
 
 
             $res = GeneralHelper::unCompress($file, $dest, $password);
@@ -864,11 +866,12 @@ trait HelperBot
 
         if (($ext == 'rar' && $this->rarExtensionIsEnable) || $ext == 'zip') {
 
-            $dest = $this->storage . '/' . $this->fromId . '/uncompress';
+            $dest = $this->storage .DIRECTORY_SEPARATOR. $this->fromId . DIRECTORY_SEPARATOR.'uncompress';
 
 
             $res = GeneralHelper::unCompress($file, $dest, $password,$continueFileName,$toOrFrom,$from,$to);
-
+            
+var_dump($res);
             if (isset($res['result']) && $res['result'] == 'Extraction failed (wrong password?)') {
 
                 return $res['result'];
@@ -920,7 +923,7 @@ trait HelperBot
             'text' =>  var_export($input, true)]);
 
     }
-    
+
     public function getFileSize($type, $message)
     {
         if ($type != 'photo') {
