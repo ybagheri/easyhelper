@@ -808,7 +808,7 @@ trait HelperBot
         $ext = pathinfo($file, PATHINFO_EXTENSION);
 
         if (($ext == 'rar' && $this->rarExtensionIsEnable) || $ext == 'zip') {
-            if (!empty($this->setting[$this->fromId]['compressed_password'] && is_array($this->setting[$this->fromId]['compressed_password']))) {
+            if (isset($this->setting[$this->fromId]['compressed_password']) && is_array($this->setting[$this->fromId]['compressed_password'])) {
                 $arr = GeneralHelper::searchThroughArrayWithKey($message_id, $this->setting[$this->fromId]['compressed_password'], 'message_id');
                 $password = $arr[array_keys($arr)[0]]['password'];
             } else {
