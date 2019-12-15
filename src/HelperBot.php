@@ -379,48 +379,49 @@ trait HelperBot
 
     public function download($type, $message, $file_id = null, $pathDir = null,$newName=null)
     {
-        if (true) {
+       
             if (is_null($file_id)) {
                 $file_id = self::getFileId($type, $message);
             }
             $getFile = $this->getFile(['file_id' => $file_id]);
-            $fileurl = 'https://api.telegram.org/file/bot' . $this->token . '/' . $getFile->result->file_path;
-//            var_dump(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
-//var_dump($getFile)   ;
-if (!isset($pathDir)) {
-                if(is_null($newName)){
-                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+            if($getFile->ok !== false) {
+                $fileurl = 'https://api.telegram.org/file/bot' . $this->token . '/' . $getFile->result->file_path;
 
-                }else{
-                    //$this->log($getFile->result->file_path);
+                if (!isset($pathDir)) {
+                    if (is_null($newName)) {
+                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
 
-                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . $newName.'.'.(is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION))?'jpg':pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+                    } else {
+                        //$this->log($getFile->result->file_path);
 
+                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR . $newName . '.' . (is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION)) ? 'jpg' : pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+
+                    }
+                } else {
+                    if (is_null($newName)) {
+                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
+
+                    } else {
+                        $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . $newName . '.' . (is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION)) ? 'jpg' : pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
+
+                    }
+                    $dir = $this->storage . '/' . $this->fromId;
+                    if (!is_dir(realpath($dir . "/$pathDir"))) {
+                        mkdir($dir . "/$pathDir");
+                    }
                 }
-            } else {
-                if(is_null($newName)){
-                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR . pathinfo($getFile->result->file_path, PATHINFO_BASENAME);
-
-                }else{
-                    $path = $this->storage . DIRECTORY_SEPARATOR . $this->fromId . DIRECTORY_SEPARATOR . $pathDir . DIRECTORY_SEPARATOR .  $newName.'.'.(is_null(pathinfo($getFile->result->file_path, PATHINFO_EXTENSION))?'jpg':pathinfo($getFile->result->file_path, PATHINFO_EXTENSION));
-
-                }
-                $dir = $this->storage . '/' . $this->fromId;
-                if (!is_dir(realpath($dir . "/$pathDir"))) {
-                    mkdir($dir . "/$pathDir");
-                }
-            }
 
 //            if (file_put_contents($path, fopen($fileurl, 'r')) !== false) {
 //                return $path;
 //            }
 
-            if (self::downloadWithCurlProgress($type, $this->botToken, $this->fromId, $path, $fileurl) !== false) {
-                return array($getFile,$path);
+                if (self::downloadWithCurlProgress($type, $this->botToken, $this->fromId, $path, $fileurl) !== false) {
+                    return array($getFile, $path);
+                }
             }
+           
 
-
-        }
+        
         return false;
 
     }
