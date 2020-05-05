@@ -310,6 +310,16 @@ trait HelperBot
             return 'voice';
         } elseif (isset($message->video_note)) {
             return 'video_note';
+        } elseif (isset($message->animation)) {
+            return 'animation';
+        } elseif (isset($message->game)) {
+            return 'game';
+        } elseif (isset($message->sticker)) {
+            return 'sticker';
+       } elseif (isset($message->poll)) {
+        return 'poll';
+       } elseif (isset($message->dice)) {
+        return 'dice';
         }
         return false;
     }
