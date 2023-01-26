@@ -147,6 +147,9 @@ trait GeneralHelper
         } catch (\Exception $e) {
             echo ($e->getMessage());
         }
+       
+      
+      try{
         $DeterminedMIMEtype = '';
         if ($fp = fopen($filename, 'rb')) {
             $getID3->openfile($filename);
@@ -167,6 +170,11 @@ trait GeneralHelper
         } else {
             echo 'Failed to fopen "' . htmlentities($filename) . '"<br>';
         }
+      } catch (\Exception $e) {
+            echo ($e->getMessage());
+        return false;
+        }
+      
         return $DeterminedMIMEtype;
     }
 
@@ -410,6 +418,7 @@ trait GeneralHelper
 
     public function searchThroughArray($search, array $lists)
     {
+      $val=[];
         try {
 
             foreach ($lists as $key => $value) {
@@ -434,6 +443,7 @@ trait GeneralHelper
 
     public function searchThroughArrayWithKey($search, array $lists, $keySearch)
     {
+       $val=[];
         try {
 
             foreach ($lists as $key => $value) {
@@ -786,4 +796,24 @@ trait GeneralHelper
         return isset($mime_map[$mime]) === true ? $mime_map[$mime] : false;
     }
 
+  //full $filePath file exist in server.  
+  public function getFileTypeForSendingToTelegram($filePath){
+    $mime = self::GetMIMEtype($filePath);
+    $mime = self::mime2ext($mime);
+   
+    if($mime <> '')
+      if(self::searchThroughArray($mime, ['mp4','mkv','avi','mov']))
+        return 'Video';
+    
+    if($mime <> '')
+      if(self::searchThroughArray($mime, ['gif','jpg','tiff','tif','jpeg','bmp']))
+        return 'Photo';
+    
+    if($mime <> '')
+      if(self::searchThroughArray($mime, ['mp3','wav','aiff','wma']))
+        return 'Audio';
+    if($mime == 'ogg')
+      return 'Voice';
+  }
+  
 }
