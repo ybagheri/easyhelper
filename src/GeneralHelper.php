@@ -162,7 +162,7 @@ trait GeneralHelper
                 $formattest = fread($fp, 16);  // 16 bytes is sufficient for any format except ISO CD-image
                 fclose($fp);
                 $DeterminedFormatInfo = $getID3->GetFileFormat($formattest);
-
+if(!isset($DeterminedFormatInfo['mime_type']))return false;
                 $DeterminedMIMEtype = $DeterminedFormatInfo['mime_type'];
             } else {
                 echo 'Failed to getID3->openfile "' . htmlentities($filename) . '"<br>';
@@ -798,7 +798,11 @@ trait GeneralHelper
 
   //full $filePath file exist in server.  
   public function getFileTypeForSendingToTelegram($filePath){
-    $mime = self::GetMIMEtype($filePath);
+    //$mime = self::GetMIMEtype($filePath);
+    
+    //if ($mime==false)return false;
+    $mime=mime_content_type($filePath);
+    //var_dump($mime);
     $mime = self::mime2ext($mime);
    
     if($mime <> '')
@@ -806,7 +810,7 @@ trait GeneralHelper
         return 'Video';
     
     if($mime <> '')
-      if(self::searchThroughArray($mime, ['gif','jpg','tiff','tif','jpeg','bmp']))
+      if(self::searchThroughArray($mime, ['gif','jpg','tiff','tif','jpeg','bmp','png']))
         return 'Photo';
     
     if($mime <> '')
@@ -814,6 +818,8 @@ trait GeneralHelper
         return 'Audio';
     if($mime == 'ogg')
       return 'Voice';
+    
+    return 'Document';
   }
   
 }
